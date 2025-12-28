@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { HotDog } from "@/types/hotdog";
 import { Enemy } from "@/types/enemies";
 import BattleResult from "./BattleResult";
+import { useGameStore } from "@/stores/useGameStore";
 
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -37,6 +38,8 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   const [isEnemyHit, setIsEnemyHit] = useState(false);
   const [isHeroHit, setIsHeroHit] = useState(false);
 
+  const globalHero = useGameStore((state) => state.hero);
+  const setGlobalHero = useGameStore((state) => state.setHero);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -44,13 +47,12 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   useEffect(() => {
     // Reseta o inimigo e HotDog para o início da batalha
     const initialEnemy = { ...actualEnemy, currentLife: actualEnemy.maxLife };
-    const initialHero = { name: "Hot Dog", maxLife: 5, currentLife: 5 } as HotDog;
 
     setEnemy(initialEnemy);
-    setHero(initialHero);
+    setHero(globalHero);
 
     // Sorteia números secretos (1 até Vida Total)
-    const hSecret = getRandomInt(1, initialHero.maxLife);
+    const hSecret = getRandomInt(1, globalHero.maxLife);
     const eSecret = getRandomInt(1, initialEnemy.maxLife);
     setHeroSecret(hSecret);
     setEnemySecret(eSecret);
@@ -66,6 +68,11 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
       logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
     }
   }, [battleLog]);
+
+  const handleGiveUp = () => {
+    setGlobalHero(hero);
+    router.push("/menu");
+  };
 
   const handleRound = () => {
     if (!hero || !enemy || isBattleOver) return;
@@ -199,6 +206,12 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
             </label>
             <button onClick={handleRound} className="w-full bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg text-xl hover:bg-yellow-400 transition-colors">
               Atacar / Próxima Rodada
+            </button>
+            <button
+              onClick={handleGiveUp}
+              className="w-full bg-red-600/80 text-white font-bold py-3 px-6 rounded-lg text-xl hover:bg-red-600 transition-colors border border-red-500"
+            >
+              Desistir da Missão
             </button>
           </div>
         ) : (

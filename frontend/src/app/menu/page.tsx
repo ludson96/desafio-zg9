@@ -24,7 +24,7 @@ export default function Menu() {
             >
               <h2 className="text-2xl font-semibold text-gray-600 blur-[2px] select-none">{stage.title}</h2>
               <div className="absolute inset-0 flex items-center justify-center bg-black/10">
-                <span className="text-sm font-bold text-red-500 uppercase tracking-widest border-2 border-red-900/60 px-4 py-1 rounded bg-black/80 shadow-lg transform -rotate-6">
+                <span className="text-sm font-bold text-red-500 uppercase tracking-widest border-2 border-red-900/60 px-4 py-1 rounded bg-black/80 shadow-lg transform">
                   Bloqueado
                 </span>
               </div>
