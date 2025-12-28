@@ -15,7 +15,7 @@ export const PROLOGO = [
 
 export const STAGES = [
   {
-    id: "floresta-do-atendimentus",
+    id: "florest",
     title: "Floresta do Atendimentus"
   },
   {

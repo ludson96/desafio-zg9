@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { FLORESTA } from "@/data/dialogueData";
-import { ENEMIES } from "@/data/enemies";
 import Battle from "@/components/Battle";
+import { ENEMIES } from "@/data/enemiesData";
 
 export default function Floresta() {
   const [dialogueIndex, setDialogueIndex] = useState(0);

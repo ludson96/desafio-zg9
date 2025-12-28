@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import type { Enemy } from "@/data/enemies";
 import { HotDog } from "@/types/hotdog";
+import { Enemy } from "@/types/enemies";
 
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
 export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
-  // Inicializa o herói com valores padrão
+  // Inicializa o HotDog com valores padrão
   const [hero, setHero] = useState<HotDog>({
     name: "Hot Dog",
     maxLife: 5,
@@ -27,12 +27,15 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
   const [heroSecret, setHeroSecret] = useState<number>(0);
   const [enemySecret, setEnemySecret] = useState<number>(0);
   const [isItemEquipped, setIsItemEquipped] = useState(false);
+  const [isEnemyHit, setIsEnemyHit] = useState(false);
+  const [isHeroHit, setIsHeroHit] = useState(false);
 
+  const logContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Efeito para buscar o estado inicial do herói e preparar a batalha
+  // Efeito para buscar o estado inicial do HotDog e preparar a batalha
   useEffect(() => {
-    // Reseta o inimigo e herói para o início da batalha
+    // Reseta o inimigo e HotDog para o início da batalha
     const initialEnemy = { ...actualEnemy, currentLife: actualEnemy.maxLife };
     const initialHero = { name: "Hot Dog", maxLife: 5, currentLife: 5 } as HotDog;
 
@@ -47,8 +50,15 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
 
     setIsBattleOver(false);
     setBattleResult(null);
-    setBattleLog(["A batalha começou!", `Segredo do Herói: ${hSecret}`, `Segredo do Inimigo: ${eSecret}`]);
+    setBattleLog(["A batalha começou!", `Seu número secreto: ${hSecret}`, `Número secreto do ${actualEnemy.name}: ${eSecret}`]);
   }, [actualEnemy.id]); // A dependência agora é o ID do inimigo, que é seu identificador único.
+
+  // Auto-scroll para o final do log sempre que houver atualização
+  useEffect(() => {
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
+  }, [battleLog]);
 
   const handleRound = () => {
     if (!hero || !enemy || isBattleOver) return;
@@ -57,21 +67,23 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
     const currentEnemy = { ...enemy };
     const roundLog: string[] = [];
 
-    // --- Turno do Herói ---
+    // --- Turno do HotDog ---
     // Item equipado aumenta o número de sorteios (Ex: +1 sorteio)
     const heroDrawsCount = isItemEquipped ? 2 : 1;
     const heroDraws = Array.from({ length: heroDrawsCount }, () => getRandomInt(1, currentEnemy.maxLife));
 
     const heroHits = heroDraws.filter((n) => n === enemySecret).length;
 
-    roundLog.push(`Herói sorteou [${heroDraws.join(", ")}].`);
+    roundLog.push(`HotDog sorteou [${heroDraws.join(", ")}].`);
 
     if (heroHits > 0) {
       const damage = enemySecret * heroHits;
       currentEnemy.currentLife -= damage;
       roundLog.push(`-> ACERTOU! Dano no inimigo: ${damage}`);
+      setIsEnemyHit(true);
+      setTimeout(() => setIsEnemyHit(false), 500);
     } else {
-      roundLog.push(`-> Errou (Segredo Inimigo: ${enemySecret}).`);
+      roundLog.push(`-> Errou (Número secreto Inimigo: ${enemySecret}).`);
     }
 
     // Verifica Vitória
@@ -99,8 +111,10 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
       const damage = heroSecret * enemyHits;
       currentHero.currentLife -= damage;
       roundLog.push(`-> VOCÊ SOFREU DANO! Perdeu ${damage} de vida.`);
+      setIsHeroHit(true);
+      setTimeout(() => setIsHeroHit(false), 500);
     } else {
-      roundLog.push(`-> Inimigo errou (Seu Segredo: ${heroSecret}).`);
+      roundLog.push(`-> Inimigo errou (Meu número secreto: ${heroSecret}).`);
     }
 
     // Verifica Derrota
@@ -133,33 +147,34 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
     <main className="flex min-h-screen flex-col items-center justify-center p-8 font-mono">
       <h1 className="text-4xl font-bold mb-8">Batalha!</h1>
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Card do Herói */}
-        <div className="border-2 border-blue-500 p-4 rounded-lg">
+        {/* Card do HotDog */}
+        <div className={`border-2 border-blue-500 p-4 rounded-lg transition-all duration-300 ${isHeroHit ? "bg-red-900/50 scale-95" : ""}`}>
           <h2 className="text-2xl font-semibold text-blue-400">{hero.name}</h2>
           <p>HP: {hero.currentLife} / {hero.maxLife}</p>
-          <p className="text-sm text-gray-400">Segredo: {heroSecret}</p>
+          <p className="text-sm text-gray-400">Número secreto: {heroSecret}</p>
           <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
             <div className="bg-blue-500 h-4 rounded-full transition-all duration-500" style={{ width: `${(hero.currentLife / hero.maxLife) * 100}%` }}></div>
           </div>
         </div>
         {/* Card do Inimigo */}
-        <div className="border-2 border-red-500 p-4 rounded-lg">
+        <div className={`border-2 border-red-500 p-4 rounded-lg transition-all duration-300 ${isEnemyHit ? "bg-red-900/50 scale-95" : ""}`}>
           <h2 className="text-2xl font-semibold text-red-400">{enemy?.name}</h2>
           <p>HP: {enemy?.currentLife} / {enemy?.maxLife}</p>
-          <p className="text-sm text-gray-400">Segredo: {enemySecret}</p>
+          <p className="text-sm text-gray-400">Número secreto: {enemySecret}</p>
           <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
-            <div className="bg-red-500 h-4 rounded-full" style={{ width: `100%` }}></div>
+            <div className="bg-red-500 h-4 rounded-full transition-all duration-500" style={{ width: `${enemy ? (enemy.currentLife / enemy.maxLife) * 100 : 0}%` }}></div>
           </div>
         </div>
       </div>
 
       {/* Log da Batalha */}
-      <div className="w-full max-w-4xl h-48 bg-gray-900/50 border border-gray-700 rounded-lg p-4 overflow-y-auto mb-8 flex flex-col-reverse">
-        <div>
-          {battleLog.slice().reverse().map((line, index) => (
-            <p key={battleLog.length - index} className="text-gray-300">{`> ${line}`}</p>
-          ))}
-        </div>
+      <div
+        ref={logContainerRef}
+        className="w-full max-w-4xl h-48 bg-gray-900/50 border border-gray-700 rounded-lg p-4 overflow-y-auto mb-8"
+      >
+        {battleLog.map((line, index) => (
+          <p key={index} className="text-gray-300">{`> ${line}`}</p>
+        ))}
       </div>
 
       {/* Controles da Batalha */}
@@ -173,7 +188,7 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
                 onChange={(e) => setIsItemEquipped(e.target.checked)}
                 className="w-6 h-6 text-blue-600"
               />
-              <span className="text-lg">Equipar Item (Aumenta sorteios do Herói)</span>
+              <span className="text-lg">Equipar Item (Aumenta sorteios do HotDog)</span>
             </label>
             <button onClick={handleRound} className="w-full bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg text-xl hover:bg-yellow-400 transition-colors">
               Atacar / Próxima Rodada
