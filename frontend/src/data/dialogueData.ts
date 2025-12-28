@@ -16,35 +16,40 @@ export const PROLOGO = [
 export const STAGES = [
   {
     id: "florest",
-    title: "Floresta do Atendimentus"
+    title: "Floresta do Atendimentus",
+    isActive: true
   },
   {
-    id: "cavernas-de-faturamentus",
-    title: "Cavernas de Faturamentus"
+    id: "caves",
+    title: "Cavernas de Faturamentus",
+    isActive: true
   },
   {
-    id: "vila-da-tramssao",
-    title: "Vila da Transmissão"
+    id: "village",
+    title: "Vila da Transmissão",
+    isActive: false
   },
   {
-    id: "torre-de-contas-a-receber",
-    title: "Torre de Contas a Receber"
+    id: "tower",
+    title: "Torre de Contas a Receber",
+    isActive: false
   },
   {
     id: "final-battle",
-    title: "Batalha contra Glozium (final)"
+    title: "Batalha contra Glozium (final)",
+    isActive: false
   },
 ]
 
 export const FLORESTA = [
   "Um lugar encantado, dizem que pessoas doentes ou com almas feridas podem ir a floresta para serem curadas",
   "A floresta parece mais sinistra que nunca, Hot Dog percorre lugares combrios e neblinados enquanto fala com seu pai Sandubinha, que intrui telepaticamente:",
-  "<i>- Sandubinha - na floresta de Atendimentus, encontre o ser \"Processus\" ele irá te mostrar o monstro a ser enfrentado.</i>",
+  "<i>Sandubinha - na floresta de Atendimentus, encontre o ser \"Processus\" ele irá te mostrar o monstro a ser enfrentado.</i>",
   "Porém Hot Dog se perde na floresta, mas de repente seu cachorro fareja algo e começa a correr, o herói o segue pois confia totalmente me seu querido animal.",
   "mergulhando nos arbustos de espinhos que ragam a pele, eles correm até um campo limpo e se deparam com algo terrível...",
   "Processus estava morto, caído aos pés de uma criatura humanoide com um olhar nojento e arrogante, como um demônio:",
-  "- Hot Dob - não há dúvidas, você é o inimigo, como você feriu o Processus? não era para seu poder afetar seres mágicos do tipo dele!",
-  "- Monstro - não afeta diretamente, mas interfere no equilíbrio, eu impeço o atendimento das almas, eu sou <strong>Anti-authorizatus!</strong> e mesmo esses seres precisam passar pelo Ciclo de Hospitales HAHAHA que pena, esse já era, agora é sua vez e depois matarei esse pirralho assustado nos arbustos, filho desse aqui",
-  "- Hot Dog - não se preocupe jovem, irei me vingar pelo amigo de meu pai!",
+  "Hot Dob - não há dúvidas, você é o inimigo, como você feriu o Processus? não era para seu poder afetar seres mágicos do tipo dele!",
+  "Monstro - não afeta diretamente, mas interfere no equilíbrio, eu impeço o atendimento das almas, eu sou <strong>Anti-authorizatus!</strong> e mesmo esses seres precisam passar pelo Ciclo de Hospitales HAHAHA que pena, esse já era, agora é sua vez e depois matarei esse pirralho assustado nos arbustos, filho desse aqui",
+  "Hot Dog - não se preocupe jovem, irei me vingar pelo amigo de meu pai!",
   "Uma batalha sangrenta se inicia..."
 ]

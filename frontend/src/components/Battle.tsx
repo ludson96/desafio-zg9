@@ -4,12 +4,19 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { HotDog } from "@/types/hotdog";
 import { Enemy } from "@/types/enemies";
+import BattleResult from "./BattleResult";
 
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
-export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
+interface BattleProps {
+  enemy: Enemy;
+  victoryText?: string;
+  defeatText?: string;
+}
+
+export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: BattleProps) {
   // Inicializa o HotDog com valores padrão
   const [hero, setHero] = useState<HotDog>({
     name: "Hot Dog",
@@ -195,14 +202,12 @@ export default function Battle({ enemy: actualEnemy }: { enemy: Enemy }) {
             </button>
           </div>
         ) : (
-          <div className="text-center">
-            <p className={`text-3xl font-bold mb-4 ${isVictory ? 'text-green-500' : 'text-red-500'}`}>
-              {isVictory ? 'VITÓRIA!' : 'DERROTA!'}
-            </p>
-            <button onClick={() => router.push("/menu")} className="bg-blue-500 text-white font-bold py-3 px-8 rounded-lg text-xl hover:bg-blue-400 transition-colors">
-              Continuar Jornada
-            </button>
-          </div>
+          <BattleResult
+            isVictory={isVictory || false}
+            onContinue={() => router.push("/menu")}
+            victoryText={victoryText}
+            defeatText={defeatText}
+          />
         )}
       </div>
     </main>
