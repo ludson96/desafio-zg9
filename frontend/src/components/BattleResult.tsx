@@ -19,9 +19,10 @@ export default function BattleResult({
           GAME OVER
         </h1>
         <div className="max-w-2xl text-center mb-12 px-6">
-          <p className="text-2xl md:text-3xl text-gray-400 font-serif italic leading-relaxed">
-            "{defeatText || "Você caiu em combate..."}"
-          </p>
+          <p
+            className="text-2xl md:text-3xl text-gray-400 font-serif italic leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: `"${defeatText || ''}"` }}
+          />
         </div>
         <button
           onClick={onContinue}
@@ -39,9 +40,10 @@ export default function BattleResult({
         VITÓRIA!
       </h1>
       <div className="max-w-2xl text-center mb-12 px-6">
-        <p className="text-2xl md:text-3xl text-gray-400 font-serif italic leading-relaxed">
-          "{victoryText}"
-        </p>
+        <p
+          className="text-2xl md:text-3xl text-gray-400 font-serif italic leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: `"${victoryText || ''}"` }}
+        />
       </div>
       <button
         onClick={onContinue}

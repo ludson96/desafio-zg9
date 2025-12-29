@@ -2,7 +2,7 @@ export const PROLOGO = [
   "A Jornada de Hot Dog",
   "📜 Passado...",
   "Vindo de onde os olhos não conseguiam alcançar, com um som alto passando pelas montanhas e vales, pelos rios e florestas. Todos no mundo puderam ouvir uma voz que parecia um estrondo, que dizia:",
-  "Contemplem seu novo mestre, Glozium..." ,
+  "Contemplem seu novo mestre, Glozium...",
   "<strong>Demonstrativus potentiaaam!!!</strong>",
   "O terro re caiu sobre as pessoas e o mundo foi tomadao por uma neblina que provocou todo tipo de mazela. Alguns morreram, outros tornaram-se monstros, animais sofreram mutações. Mas após a dissolução dessa terrível onda mortífera, era possível ver em meio a neblina o que pareciam estátuas em pé, onde o som foi mais intenso...",
   "⏳ Agora...",
@@ -52,4 +52,24 @@ export const FLORESTA = [
   "Monstro - não afeta diretamente, mas interfere no equilíbrio, eu impeço o atendimento das almas, eu sou <strong>Anti-authorizatus!</strong> e mesmo esses seres precisam passar pelo Ciclo de Hospitales HAHAHA que pena, esse já era, agora é sua vez e depois matarei esse pirralho assustado nos arbustos, filho desse aqui",
   "Hot Dog - não se preocupe jovem, irei me vingar pelo amigo de meu pai!",
   "Uma batalha sangrenta se inicia..."
+]
+
+export const CAVES = [
+  "Existe sempre um preço a se pagar pela cura do corpo e da alma, após a <strong>floresta do atendimentus</strong> seu preço é calculado de acordo com o tipo de contrato divino qeu você tem...",
+  "Esplorando a caverna com uma tocha, Hot Dog ouve sons metálicos ao longe. Ao alcançar uma área iluminada por minérios misteriosos, encontra <strong>três caminhos e um enigma</strong> indicando a pista para a escolha certa:"
+];
+
+export const CAVES_RIDDLE = {
+  question: "Do enfermo vem o início, do registro o meio, do pagamento o fim do anseio. Gira sem parar nos salões do curar — que ciclo é esse a sustentar?",
+  options: [
+    { text: "O Ciclum Receitatus Hospitalis", isCorrect: true, consequence: null, message: "A porta se abre revelando o caminho correto." },
+    { text: "O Rito dos Curandeiros Eternos", isCorrect: false, consequence: "damage", message: "Você segue em frente, porém, cai em uma armadilha e sofre 2 de dano." },
+    { text: "A Roda da Vida e da Cura", isCorrect: false, consequence: "buff", message: "Você sente uma energia sombria fortalecendo o inimigo. O chefão da fase ganha +6 de vida." }
+  ]
+};
+
+export const CAVES_BEFORE_BATTLE = [
+  "Hot Dog alcança um novo local, onde os Acições do Faturamento trabalham sem dar atenção aos arredores. De repente, ele encontra o <strong>mostro da caverna</strong> - um <strong> cavaleiro infernal</strong> forjado por Gloizum, afiando sua espada.",
+  "Glozium Administratus - você é o herói deste ano? não me parece grande coisa. Não sou muito de conversa, venha lutar, irei te fatiar e servir pros lacaios de meu mestre!",
+  "Hot Dog - algmas piadas ruins podem até me fazer rir, você é uma dessas, hahaha...se prepare!"
 ]

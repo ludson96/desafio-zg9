@@ -212,7 +212,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
         )}
 
         {/* Área Principal da Batalha (Centralizada) */}
-        <div className="flex w-full max-w-4xl flex-shrink-0 flex-col items-center">
+        <div className="flex w-full max-w-4xl shrink-0 flex-col items-center">
           <h1 className="mb-8 text-4xl font-bold">Batalha!</h1>
           <div className="mb-8 grid w-full grid-cols-1 gap-8 md:grid-cols-2">
             {/* Card do HotDog */}
