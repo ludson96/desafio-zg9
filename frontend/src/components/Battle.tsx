@@ -74,6 +74,22 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     router.push("/menu");
   };
 
+  const onContinue = () => {
+    if (isVictory) {
+      setGlobalHero({ ...hero, maxLife: hero.maxLife + 5, currentLife: hero.currentLife + 5 });
+      router.push("/menu");
+    } else {
+      // Reseta o herói para o estado inicial e volta para o início do jogo
+      setGlobalHero({
+        name: "Hot Dog",
+        maxLife: 5,
+        currentLife: 5,
+        live: true,
+      });
+      router.push("/");
+    }
+  }
+
   const handleRound = () => {
     if (!hero || !enemy || isBattleOver) return;
 
@@ -217,7 +233,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
         ) : (
           <BattleResult
             isVictory={isVictory || false}
-            onContinue={() => router.push("/menu")}
+            onContinue={onContinue}
             victoryText={victoryText}
             defeatText={defeatText}
           />

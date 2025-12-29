@@ -27,7 +27,7 @@ export default function BattleResult({
           onClick={onContinue}
           className="px-10 py-4 bg-red-700 hover:bg-red-600 text-white font-bold rounded-lg text-xl transition-all hover:scale-105 shadow-[0_0_20px_rgba(220,38,38,0.5)] border border-red-500"
         >
-          Retornar ao Menu
+          Jogar novamente
         </button>
       </div>
     );
