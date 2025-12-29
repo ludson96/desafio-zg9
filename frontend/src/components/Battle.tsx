@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { HotDog } from "@/types/hotdog";
@@ -34,7 +35,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   // Novos estados para a lógica de batalha frontend
   const [heroSecret, setHeroSecret] = useState<number>(0);
   const [enemySecret, setEnemySecret] = useState<number>(0);
-  const [isItemEquipped, setIsItemEquipped] = useState(false);
+  const [isCombinedAttack, setIsCombinedAttack] = useState(false);
   const [isEnemyHit, setIsEnemyHit] = useState(false);
   const [isHeroHit, setIsHeroHit] = useState(false);
 
@@ -98,8 +99,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     const roundLog: string[] = [];
 
     // --- Turno do HotDog ---
-    // Item equipado aumenta o número de sorteios (Ex: +1 sorteio)
-    const heroDrawsCount = isItemEquipped ? 2 : 1;
+    const heroDrawsCount = 1; // O HotDog sempre sorteia 1 número
     const heroDraws = Array.from({ length: heroDrawsCount }, () => getRandomInt(1, currentEnemy.maxLife));
 
     const heroHits = heroDraws.filter((n) => n === enemySecret).length;
@@ -107,7 +107,11 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     roundLog.push(`HotDog sorteou [${heroDraws.join(", ")}].`);
 
     if (heroHits > 0) {
-      const damage = enemySecret * heroHits;
+      let damage = enemySecret * heroHits;
+      if (isCombinedAttack) {
+        damage += 1;
+        roundLog.push(`Salsichinha ajuda no ataque! Dano bônus: +1`);
+      }
       currentEnemy.currentLife -= damage;
       roundLog.push(`-> ACERTOU! Dano no inimigo: ${damage}`);
       setIsEnemyHit(true);
@@ -174,70 +178,112 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   const isVictory = battleResult?.startsWith("VITÓRIA");
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8 font-mono">
-      <h1 className="text-4xl font-bold mb-8">Batalha!</h1>
-      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-        {/* Card do HotDog */}
-        <div className={`border-2 border-blue-500 p-4 rounded-lg transition-all duration-300 ${isHeroHit ? "bg-red-900/50 scale-95" : ""}`}>
-          <h2 className="text-2xl font-semibold text-blue-400">{hero.name}</h2>
-          <p>HP: {hero.currentLife} / {hero.maxLife}</p>
-          <p className="text-sm text-gray-400">Número secreto: {heroSecret}</p>
-          <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
-            <div className="bg-blue-500 h-4 rounded-full transition-all duration-500" style={{ width: `${(hero.currentLife / hero.maxLife) * 100}%` }}></div>
+    <main className="flex min-h-screen w-full items-center justify-center p-4 font-mono md:p-8">
+      <div className="flex w-full max-w-7xl items-start justify-center gap-8">
+        {/* Coluna de Itens (Esquerda) - Visível em telas grandes */}
+        {!isBattleOver && (
+          <div className="hidden w-48 flex-col items-center gap-4 pt-24 lg:flex">
+            <h3 className="mb-2 text-xl font-bold text-gray-400">Itens</h3>
+            {/* Item Ativável: Salsichinha */}
+            <div className="flex flex-col items-center justify-center gap-1">
+              <button
+                onClick={() => setIsCombinedAttack(!isCombinedAttack)}
+                aria-pressed={isCombinedAttack}
+                className={`group flex h-32 w-32 transform flex-col cursor-pointer items-center justify-center gap-2 rounded-xl border-4 p-3 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isCombinedAttack
+                    ? "border-yellow-400 bg-yellow-900/30 shadow-[0_0_20px_rgba(250,204,21,0.5)]"
+                    : "border-gray-700 bg-gray-900/50 hover:border-gray-500"
+                  }`}
+              >
+                <Image
+                  src="/sal2.png"
+                  alt="Salsichinha"
+                  width={60}
+                  height={60}
+                  className={`transition-all duration-300 ${!isCombinedAttack ? "grayscale opacity-60" : ""}`}
+                />
+                <span className="text-sm font-semibold">Salsichinha</span>
+              </button>
+              <p className={`h-10 w-32 text-center text-sm font-semibold transition-colors duration-300 ${isCombinedAttack ? "text-yellow-400" : "text-gray-400"}`}>
+                {isCombinedAttack ? "Ataque Combinado ATIVADO" : "Ataque Combinado"}
+              </p>
+            </div>
+            {/* Outros itens podem ser adicionados aqui */}
           </div>
-        </div>
-        {/* Card do Inimigo */}
-        <div className={`border-2 border-red-500 p-4 rounded-lg transition-all duration-300 ${isEnemyHit ? "bg-red-900/50 scale-95" : ""}`}>
-          <h2 className="text-2xl font-semibold text-red-400">{enemy?.name}</h2>
-          <p>HP: {enemy?.currentLife} / {enemy?.maxLife}</p>
-          <p className="text-sm text-gray-400">Número secreto: {enemySecret}</p>
-          <div className="w-full bg-gray-700 rounded-full h-4 mt-2">
-            <div className="bg-red-500 h-4 rounded-full transition-all duration-500" style={{ width: `${enemy ? (enemy.currentLife / enemy.maxLife) * 100 : 0}%` }}></div>
-          </div>
-        </div>
-      </div>
-
-      {/* Log da Batalha */}
-      <div
-        ref={logContainerRef}
-        className="w-full max-w-4xl h-48 bg-gray-900/50 border border-gray-700 rounded-lg p-4 overflow-y-auto mb-8"
-      >
-        {battleLog.map((line, index) => (
-          <p key={index} className="text-gray-300">{`> ${line}`}</p>
-        ))}
-      </div>
-
-      {/* Controles da Batalha */}
-      <div className="w-full max-w-4xl">
-        {!isBattleOver ? (
-          <div className="flex flex-col gap-4">
-            <label className="flex items-center space-x-2 cursor-pointer bg-gray-800 p-3 rounded-lg border border-gray-600">
-              <input
-                type="checkbox"
-                checked={isItemEquipped}
-                onChange={(e) => setIsItemEquipped(e.target.checked)}
-                className="w-6 h-6 text-blue-600"
-              />
-              <span className="text-lg">Equipar Item (Aumenta sorteios do HotDog)</span>
-            </label>
-            <button onClick={handleRound} className="w-full bg-yellow-500 text-black font-bold py-3 px-6 rounded-lg text-xl hover:bg-yellow-400 transition-colors">
-              Atacar / Próxima Rodada
-            </button>
-            <button
-              onClick={handleGiveUp}
-              className="w-full bg-red-600/80 text-white font-bold py-3 px-6 rounded-lg text-xl hover:bg-red-600 transition-colors border border-red-500"
-            >
-              Desistir da Missão
-            </button>
-          </div>
-        ) : (
-          <BattleResult
-            isVictory={isVictory || false}
-            onContinue={onContinue}
-            victoryText={victoryText}
-            defeatText={defeatText}
-          />
         )}
+
+        {/* Área Principal da Batalha (Centralizada) */}
+        <div className="flex w-full max-w-4xl flex-shrink-0 flex-col items-center">
+          <h1 className="mb-8 text-4xl font-bold">Batalha!</h1>
+          <div className="mb-8 grid w-full grid-cols-1 gap-8 md:grid-cols-2">
+            {/* Card do HotDog */}
+            <div className={`rounded-lg border-2 border-blue-500 p-4 transition-all duration-300 ${isHeroHit ? "scale-95 bg-red-900/50" : ""}`}>
+              <h2 className="text-2xl font-semibold text-blue-400">{hero.name}</h2>
+              <p>HP: {hero.currentLife} / {hero.maxLife}</p>
+              <p className="text-sm text-gray-400">Número secreto: {heroSecret}</p>
+              <div className="mt-2 h-4 w-full rounded-full bg-gray-700">
+                <div className="h-4 rounded-full bg-blue-500 transition-all duration-500" style={{ width: `${(hero.currentLife / hero.maxLife) * 100}%` }}></div>
+              </div>
+            </div>
+            {/* Card do Inimigo */}
+            <div className={`rounded-lg border-2 border-red-500 p-4 transition-all duration-300 ${isEnemyHit ? "scale-95 bg-red-900/50" : ""}`}>
+              <h2 className="text-2xl font-semibold text-red-400">{enemy?.name}</h2>
+              <p>HP: {enemy?.currentLife} / {enemy?.maxLife}</p>
+              <p className="text-sm text-gray-400">Número secreto: {enemySecret}</p>
+              <div className="mt-2 h-4 w-full rounded-full bg-gray-700">
+                <div className="h-4 rounded-full bg-red-500 transition-all duration-500" style={{ width: `${enemy ? (enemy.currentLife / enemy.maxLife) * 100 : 0}%` }}></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Log da Batalha */}
+          <div
+            ref={logContainerRef}
+            className="mb-8 h-48 w-full max-w-4xl overflow-y-auto rounded-lg border border-gray-700 bg-gray-900/50 p-4"
+          >
+            {battleLog.map((line, index) => (
+              <p key={index} className="text-gray-300">{`> ${line}`}</p>
+            ))}
+          </div>
+
+          {/* Controles da Batalha */}
+          <div className="w-full max-w-4xl">
+            {!isBattleOver ? (
+              <div className="flex w-full flex-col gap-4">
+                {/* Item ativável em telas pequenas */}
+                <div className="flex flex-col items-center justify-center gap-2 lg:hidden">
+                  <h3 className="mb-2 text-xl font-bold text-gray-400">Itens</h3>
+                  <button
+                    onClick={() => setIsCombinedAttack(!isCombinedAttack)}
+                    aria-pressed={isCombinedAttack}
+                    className={`group flex h-24 w-24 transform flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isCombinedAttack
+                        ? "border-yellow-400 bg-yellow-900/30"
+                        : "border-gray-700 bg-gray-900/50"
+                      }`}
+                  >
+                    <Image src="/sal2.png" alt="Salsichinha" width={40} height={40} className={`transition-all duration-300 ${!isCombinedAttack ? "grayscale opacity-60" : ""}`} />
+                    <span className="text-xs font-semibold">Salsichinha</span>
+                  </button>
+                  <p className={`h-5 text-center text-xs font-semibold transition-colors duration-300 ${isCombinedAttack ? "text-yellow-400" : "text-gray-400"}`}>
+                    {isCombinedAttack ? "Ativado" : "Desativado"}
+                  </p>
+                </div>
+                <button onClick={handleRound} className="w-full rounded-lg bg-yellow-500 py-3 px-6 text-xl font-bold text-black transition-colors hover:bg-yellow-400">
+                  Atacar / Próxima Rodada
+                </button>
+                <button onClick={handleGiveUp} className="w-full rounded-lg border border-red-500 bg-red-600/80 py-3 px-6 text-xl font-bold text-white transition-colors hover:bg-red-600">
+                  Desistir da Missão
+                </button>
+              </div>
+            ) : (
+              <BattleResult
+                isVictory={isVictory || false}
+                onContinue={onContinue}
+                victoryText={victoryText}
+                defeatText={defeatText}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );
