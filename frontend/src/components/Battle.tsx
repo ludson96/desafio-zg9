@@ -65,8 +65,6 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
   const [battleLog, setBattleLog] = useState<string[]>([]);
   const [isBattleOver, setIsBattleOver] = useState(false);
   const [battleResult, setBattleResult] = useState<string | null>(null);
-
-  // Novos estados para a lógica de batalha frontend
   const [heroSecret, setHeroSecret] = useState<number>(0);
   const [enemySecret, setEnemySecret] = useState<number>(0);
   const [activeItems, setActiveItems] = useState<Set<string>>(new Set());
@@ -74,10 +72,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
   const [isHeroHit, setIsHeroHit] = useState(false);
 
   const globalHero = useGameStore((state) => state.hero);
-  // Para adicionar ou remover itens do jogador, modifique o estado global.
-  // Ex: const heroOwnedItemIds = useGameStore((state) => state.hero.items) || ['salsichinha'];
-  // Para esta demonstração, vamos assumir que o herói possui ambos os itens.
-  // No jogo real, você controlaria os itens do herói através do `useGameStore`.
+  // Controla os itens do herói através do `useGameStore`.
   const heroOwnedItemIds = globalHero?.items || ['sword', 'salsichinha'];
   const heroOwnedItems = heroOwnedItemIds.map(id => allGameItems[id]).filter((item): item is GameItem => !!item);
 
@@ -87,7 +82,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
 
   // Efeito para buscar o estado inicial do HotDog e preparar a batalha
   useEffect(() => {
-    // Reseta o inimigo e HotDog para o início da batalha
+    // Reseta o inimigo para o início da batalha
     const initialEnemy = { ...actualEnemy, currentLife: actualEnemy.maxLife };
 
     setEnemy(initialEnemy);
@@ -137,8 +132,6 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
 
   const onContinue = () => {
     if (isVictory) {
-      // Garante que a lista de itens seja preservada e passada para a função onVictory.
-      // O estado 'hero' local pode não ter a lista de itens se ela não veio do estado global.
       let updatedHero: HotDog = {
         ...hero,
         items: heroOwnedItemIds,
@@ -156,7 +149,6 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
         maxLife: 5,
         currentLife: 5,
         live: true,
-        // Restaura os itens iniciais em caso de derrota
         items: ['sword', 'salsichinha']
       });
       router.push("/");
@@ -172,7 +164,6 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
 
     const isCombinedAttack = activeItems.has('salsichinha');
     const isGuideActive = activeItems.has('guia-atendimento');
-    const isSwordActive = activeItems.has('sword');
 
     // --- Turno do HotDog ---
     let heroDrawsCount = 1; // O HotDog sempre sorteia 1 número por padrão
