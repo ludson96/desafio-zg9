@@ -8,6 +8,39 @@ import { Enemy } from "@/types/enemies";
 import BattleResult from "./BattleResult";
 import { useGameStore } from "@/stores/useGameStore";
 
+// Definição dos itens do jogo
+interface GameItem {
+  id: string;
+  name: string;
+  imageSrc: string;
+  description: string;
+  activeText: string;
+}
+
+const allGameItems: Record<string, GameItem> = {
+  sword: {
+    id: 'sword',
+    name: 'Espada Simples',
+    imageSrc: '/sword.png',
+    description: 'Eficaz contra lacaios',
+    activeText: '+1 de ataque',
+  },
+  salsichinha: {
+    id: 'salsichinha',
+    name: 'Salsichinha',
+    imageSrc: '/sal2.png',
+    description: 'Ataque Combinado',
+    activeText: '+1 de ataque',
+  },
+  'guia-atendimento': {
+    id: 'guia-atendimento',
+    name: 'Guia de Atendimento',
+    imageSrc: '/scroll.png',
+    description: 'Sorteia 2 números por ataque',
+    activeText: '+2 de ataque',
+  },
+};
+
 const getRandomInt = (min: number, max: number) => {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
@@ -35,11 +68,18 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   // Novos estados para a lógica de batalha frontend
   const [heroSecret, setHeroSecret] = useState<number>(0);
   const [enemySecret, setEnemySecret] = useState<number>(0);
-  const [isCombinedAttack, setIsCombinedAttack] = useState(false);
+  const [activeItems, setActiveItems] = useState<Set<string>>(new Set());
   const [isEnemyHit, setIsEnemyHit] = useState(false);
   const [isHeroHit, setIsHeroHit] = useState(false);
 
   const globalHero = useGameStore((state) => state.hero);
+  // Para adicionar ou remover itens do jogador, modifique o estado global.
+  // Ex: const heroOwnedItemIds = useGameStore((state) => state.hero.items) || ['salsichinha'];
+  // Para esta demonstração, vamos assumir que o herói possui ambos os itens.
+  // No jogo real, você controlaria os itens do herói através do `useGameStore`.
+  const heroOwnedItemIds = ['sword', 'salsichinha'];
+  const heroOwnedItems = heroOwnedItemIds.map(id => allGameItems[id]).filter((item): item is GameItem => !!item);
+
   const setGlobalHero = useGameStore((state) => state.setHero);
   const logContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -61,7 +101,12 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     setIsBattleOver(false);
     setBattleResult(null);
     setBattleLog(["A batalha começou!", `Seu número secreto: ${hSecret}`, `Número secreto do ${actualEnemy.name}: ${eSecret}`]);
-  }, [actualEnemy.id]); // A dependência agora é o ID do inimigo, que é seu identificador único.
+
+    const initialActiveItems = new Set<string>();
+    // A Espada Simples deve começar ativada se o herói a possuir
+    if (heroOwnedItemIds.includes('sword')) initialActiveItems.add('sword');
+    setActiveItems(initialActiveItems);
+  }, [actualEnemy.id, globalHero]); // A dependência agora é o ID do inimigo, que é seu identificador único.
 
   // Auto-scroll para o final do log sempre que houver atualização
   useEffect(() => {
@@ -70,6 +115,20 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     }
   }, [battleLog]);
 
+  const toggleItem = (itemId: string) => {
+    // A Espada Simples não pode ser desativada
+    if (itemId === 'sword') return;
+
+    setActiveItems(prev => {
+      const newActiveItems = new Set(prev);
+      if (newActiveItems.has(itemId)) {
+        newActiveItems.delete(itemId);
+      } else {
+        newActiveItems.add(itemId);
+      }
+      return newActiveItems;
+    });
+  };
   const handleGiveUp = () => {
     setGlobalHero(hero);
     router.push("/menu");
@@ -98,8 +157,16 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
     const currentEnemy = { ...enemy };
     const roundLog: string[] = [];
 
+    const isCombinedAttack = activeItems.has('salsichinha');
+    const isGuideActive = activeItems.has('guia-atendimento');
+    const isSwordActive = activeItems.has('sword');
+
     // --- Turno do HotDog ---
-    const heroDrawsCount = 1; // O HotDog sempre sorteia 1 número
+    let heroDrawsCount = 1; // O HotDog sempre sorteia 1 número por padrão
+    if (isGuideActive) {
+      heroDrawsCount = 2;
+      roundLog.push(`📜 Guia de Atendimento ativado! Você sorteia 2 números.`);
+    }
     const heroDraws = Array.from({ length: heroDrawsCount }, () => getRandomInt(1, currentEnemy.maxLife));
 
     const heroHits = heroDraws.filter((n) => n === enemySecret).length;
@@ -108,6 +175,9 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
 
     if (heroHits > 0) {
       let damage = enemySecret * heroHits;
+      if (isSwordActive) {
+        damage += 1;
+      }
       if (isCombinedAttack) {
         damage += 1;
         roundLog.push(`Salsichinha ajuda no ataque! Dano bônus: +1`);
@@ -184,30 +254,33 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
         {!isBattleOver && (
           <div className="hidden w-48 flex-col items-center gap-4 pt-24 lg:flex">
             <h3 className="mb-2 text-xl font-bold text-gray-400">Itens</h3>
-            {/* Item Ativável: Salsichinha */}
-            <div className="flex flex-col items-center justify-center gap-1">
-              <button
-                onClick={() => setIsCombinedAttack(!isCombinedAttack)}
-                aria-pressed={isCombinedAttack}
-                className={`group flex h-32 w-32 transform flex-col cursor-pointer items-center justify-center gap-2 rounded-xl border-4 p-3 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isCombinedAttack
-                    ? "border-yellow-400 bg-yellow-900/30 shadow-[0_0_20px_rgba(250,204,21,0.5)]"
-                    : "border-gray-700 bg-gray-900/50 hover:border-gray-500"
-                  }`}
-              >
-                <Image
-                  src="/sal2.png"
-                  alt="Salsichinha"
-                  width={60}
-                  height={60}
-                  className={`transition-all duration-300 ${!isCombinedAttack ? "grayscale opacity-60" : ""}`}
-                />
-                <span className="text-sm font-semibold">Salsichinha</span>
-              </button>
-              <p className={`h-10 w-32 text-center text-sm font-semibold transition-colors duration-300 ${isCombinedAttack ? "text-yellow-400" : "text-gray-400"}`}>
-                {isCombinedAttack ? "Ataque Combinado ATIVADO" : "Ataque Combinado"}
-              </p>
-            </div>
-            {/* Outros itens podem ser adicionados aqui */}
+            {heroOwnedItems.map(item => {
+              const isActive = activeItems.has(item.id);
+              return (
+                <div key={item.id} className="flex flex-col items-center justify-center gap-1">
+                  <button
+                    onClick={() => toggleItem(item.id)}
+                    aria-pressed={isActive}
+                    className={`group flex h-40 w-40 transform flex-col cursor-pointer items-center justify-center rounded-xl border-4 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isActive
+                      ? "border-yellow-400 bg-yellow-900/30 shadow-[0_0_20px_rgba(250,204,21,0.5)]"
+                      : "border-gray-700 bg-gray-900/50 hover:border-gray-500"
+                      }`}
+                  >
+                    <Image
+                      src={item.imageSrc}
+                      alt={item.name}
+                      width={60}
+                      height={60}
+                      className={`transition-all duration-300 ${!isActive ? "grayscale opacity-60" : ""}`}
+                    />
+                    <span className="text-sm font-semibold">{item.name}</span>
+                  </button>
+                  <p className={`h-10 w-40 mb-1 text-center text-sm font-semibold transition-colors duration-300 ${isActive ? "text-yellow-400" : "text-gray-400"}`}>
+                    {isActive ? item.activeText : item.description}
+                  </p>
+                </div>
+              )
+            })}
           </div>
         )}
 
@@ -249,23 +322,32 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
           <div className="w-full max-w-4xl">
             {!isBattleOver ? (
               <div className="flex w-full flex-col gap-4">
-                {/* Item ativável em telas pequenas */}
-                <div className="flex flex-col items-center justify-center gap-2 lg:hidden">
+                {/* Itens ativáveis em telas pequenas */}
+                <div className="flex flex-col items-center justify-center gap-4 lg:hidden">
                   <h3 className="mb-2 text-xl font-bold text-gray-400">Itens</h3>
-                  <button
-                    onClick={() => setIsCombinedAttack(!isCombinedAttack)}
-                    aria-pressed={isCombinedAttack}
-                    className={`group flex h-24 w-24 transform flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isCombinedAttack
-                        ? "border-yellow-400 bg-yellow-900/30"
-                        : "border-gray-700 bg-gray-900/50"
-                      }`}
-                  >
-                    <Image src="/sal2.png" alt="Salsichinha" width={40} height={40} className={`transition-all duration-300 ${!isCombinedAttack ? "grayscale opacity-60" : ""}`} />
-                    <span className="text-xs font-semibold">Salsichinha</span>
-                  </button>
-                  <p className={`h-5 text-center text-xs font-semibold transition-colors duration-300 ${isCombinedAttack ? "text-yellow-400" : "text-gray-400"}`}>
-                    {isCombinedAttack ? "Ativado" : "Desativado"}
-                  </p>
+                  <div className="flex flex-row flex-wrap justify-center gap-4">
+                    {heroOwnedItems.map(item => {
+                      const isActive = activeItems.has(item.id);
+                      return (
+                        <div key={item.id} className="flex flex-col items-center justify-center gap-1">
+                          <button
+                            onClick={() => toggleItem(item.id)}
+                            aria-pressed={isActive}
+                            className={`group flex h-24 w-24 transform flex-col items-center justify-center gap-1 rounded-xl border-2 p-2 transition-all duration-300 ease-in-out hover:scale-105 active:scale-95 ${isActive
+                              ? "border-yellow-400 bg-yellow-900/30"
+                              : "border-gray-700 bg-gray-900/50"
+                              }`}
+                          >
+                            <Image src={item.imageSrc} alt={item.name} width={40} height={40} className={`transition-all duration-300 ${!isActive ? "grayscale opacity-60" : ""}`} />
+                            <span className="text-xs font-semibold">{item.name}</span>
+                          </button>
+                          <p className={`h-5 text-center text-xs font-semibold transition-colors duration-300 ${isActive ? "text-yellow-400" : "text-gray-400"}`}>
+                            {isActive ? "Ativado" : "Desativado"}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
                 <button onClick={handleRound} className="w-full rounded-lg bg-yellow-500 py-3 px-6 text-xl font-bold text-black transition-colors hover:bg-yellow-400">
                   Atacar / Próxima Rodada
