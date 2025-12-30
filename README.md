@@ -22,30 +22,7 @@ O objetivo é testar a lógica de programação, interpretação de texto e aná
 [![Tailwind CSS][Tailwind-CSS-logo]][Tailwind-CSS-url]
 [![React][React-logo]][React-url]
 [![Next.js][Next.js-logo]][Next.js-url]
-<a href="https://zustand-demo.pmnd.rs/" target="_blank">
-  <span style="
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 5px 10px;
-    background-color: #000000;
-    color: white;
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    font-weight: bold;
-    vertical-align: top;
-    position: relative;
-    top: 0px;
-  ">
-    <img
-      src="https://files.svgcdn.io/devicon-plain/zustand.svg"
-      alt="Zustand"
-      height="16"
-      style="filter: invert(1);"
-    />
-    ZUSTAND
-  </span>
-</a>
+[![Zustand][Zustand-logo]][Zustand-url]
 
 ## 🚀 Como Executar o Projeto
 
@@ -87,3 +64,5 @@ O objetivo é testar a lógica de programação, interpretação de texto e aná
 [ESLint-url]: https://eslint.org/
 [Next.js-logo]: https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white
 [Next.js-url]: https://nextjs.org/
+[Zustand-logo]: https://img.shields.io/badge/Zustand-black?style=for-the-badge
+[Zustand-url]: https://zustand-demo.pmnd.rs/
