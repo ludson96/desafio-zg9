@@ -3,4 +3,5 @@ export type HotDog = {
   maxLife: number;
   currentLife: number;
   live: boolean;
+  items?: string[];
 }

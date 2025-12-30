@@ -22,22 +22,22 @@ const allGameItems: Record<string, GameItem> = {
     id: 'sword',
     name: 'Espada Simples',
     imageSrc: '/sword.png',
-    description: 'Eficaz contra lacaios',
-    activeText: '+1 de ataque',
+    description: 'Permite o ataque básico.',
+    activeText: 'Ataque básico ATIVADO',
   },
   salsichinha: {
     id: 'salsichinha',
     name: 'Salsichinha',
     imageSrc: '/sal2.png',
-    description: 'Ataque Combinado',
-    activeText: '+1 de ataque',
+    description: 'Ataque Combinado (+1 dano)',
+    activeText: 'Ataque Combinado ATIVADO',
   },
   'guia-atendimento': {
     id: 'guia-atendimento',
     name: 'Guia de Atendimento',
     imageSrc: '/scroll.png',
-    description: 'Sorteia 2 números por ataque',
-    activeText: '+2 de ataque',
+    description: 'Sorteia 2 números por ataque.',
+    activeText: 'Sorteio Duplo ATIVADO',
   },
 };
 
@@ -49,9 +49,10 @@ interface BattleProps {
   enemy: Enemy;
   victoryText?: string;
   defeatText?: string;
+  onVictory?: (hero: HotDog) => HotDog;
 }
 
-export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: BattleProps) {
+export default function Battle({ enemy: actualEnemy, victoryText, defeatText, onVictory }: BattleProps) {
   // Inicializa o HotDog com valores padrão
   const [hero, setHero] = useState<HotDog>({
     name: "Hot Dog",
@@ -77,7 +78,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
   // Ex: const heroOwnedItemIds = useGameStore((state) => state.hero.items) || ['salsichinha'];
   // Para esta demonstração, vamos assumir que o herói possui ambos os itens.
   // No jogo real, você controlaria os itens do herói através do `useGameStore`.
-  const heroOwnedItemIds = ['sword', 'salsichinha'];
+  const heroOwnedItemIds = globalHero?.items || ['sword', 'salsichinha'];
   const heroOwnedItems = heroOwnedItemIds.map(id => allGameItems[id]).filter((item): item is GameItem => !!item);
 
   const setGlobalHero = useGameStore((state) => state.setHero);
@@ -136,7 +137,17 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
 
   const onContinue = () => {
     if (isVictory) {
-      setGlobalHero({ ...hero, maxLife: hero.maxLife + 5, currentLife: hero.currentLife + 5 });
+      // Garante que a lista de itens seja preservada e passada para a função onVictory.
+      // O estado 'hero' local pode não ter a lista de itens se ela não veio do estado global.
+      let updatedHero: HotDog = {
+        ...hero,
+        items: heroOwnedItemIds,
+        maxLife: hero.maxLife + 5, currentLife: hero.currentLife + 5
+      };
+      if (onVictory) {
+        updatedHero = onVictory(updatedHero);
+      }
+      setGlobalHero(updatedHero);
       router.push("/menu");
     } else {
       // Reseta o herói para o estado inicial e volta para o início do jogo
@@ -145,6 +156,8 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
         maxLife: 5,
         currentLife: 5,
         live: true,
+        // Restaura os itens iniciais em caso de derrota
+        items: ['sword', 'salsichinha']
       });
       router.push("/");
     }
@@ -175,9 +188,6 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText }: 
 
     if (heroHits > 0) {
       let damage = enemySecret * heroHits;
-      if (isSwordActive) {
-        damage += 1;
-      }
       if (isCombinedAttack) {
         damage += 1;
         roundLog.push(`Salsichinha ajuda no ataque! Dano bônus: +1`);

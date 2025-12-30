@@ -5,6 +5,7 @@ import Battle from "@/components/Battle";
 import { ENEMIES } from "@/data/enemiesData";
 import { CAVES, CAVES_BEFORE_BATTLE, CAVES_RIDDLE } from "@/data/dialogueData";
 import { useGameStore } from "@/stores/useGameStore";
+import { HotDog } from "@/types/hotdog";
 
 export default function CavesPage() {
   const [dialogueIndex, setDialogueIndex] = useState(0);
@@ -70,8 +71,19 @@ export default function CavesPage() {
   const victoryText = "Ansião faturador - muito obrigado, mas tô ocupado demais para agradecimentos longos, tome o artefato sagrado e siga em frente.";
   const defeatText = "Ansião faturador - herói merda, nem para cumprir o trabalho dele, estamos perdidos. <br /> <br /> O mundo foi destruído por Glozium, uma fatalidade terrível... Fim de jogo!";
 
+  const handleBattleVictory = (hero: HotDog) => {
+    const currentItems = hero.items || [];
+    if (!currentItems.includes('guia-atendimento')) {
+      return {
+        ...hero,
+        items: [...currentItems, 'guia-atendimento']
+      };
+    }
+    return hero;
+  };
+
   if (stagePhase === 'battle') {
-    return <Battle enemy={battleEnemy} victoryText={victoryText} defeatText={defeatText} />;
+    return <Battle enemy={battleEnemy} victoryText={victoryText} defeatText={defeatText} onVictory={handleBattleVictory} />;
   }
 
   if (stagePhase === 'riddle') {
