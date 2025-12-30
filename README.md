@@ -6,6 +6,9 @@ Projeto desenvolvido como parte do processo seletivo para o `Acelera ZG 9.0`.
 
 Um programa que conta uma história interativa (quase um jogo RPG, mas simples) em que o usuário avança pela história através de escolhas e interações via comandos. A história permite passagens pelos eventos, locais e desafios. O personagem evolui e adquire itens ao longo do caminho.
 
+## Deploy
+
+[![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://desafio-zg9.vercel.app/)
 
 ## Objetivo do Desafio
 
