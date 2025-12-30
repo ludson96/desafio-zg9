@@ -99,10 +99,10 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
     setBattleLog(["A batalha começou!", `Seu número secreto: ${hSecret}`, `Número secreto do ${actualEnemy.name}: ${eSecret}`]);
 
     const initialActiveItems = new Set<string>();
-    // A Espada Simples deve começar ativada se o herói a possuir
+    // A Espada Simples deve começar ativada
     if (heroOwnedItemIds.includes('sword')) initialActiveItems.add('sword');
     setActiveItems(initialActiveItems);
-  }, [actualEnemy.id, globalHero]); // A dependência agora é o ID do inimigo, que é seu identificador único.
+  }, [actualEnemy.id, globalHero]); 
 
   // Auto-scroll para o final do log sempre que houver atualização
   useEffect(() => {
@@ -166,7 +166,7 @@ export default function Battle({ enemy: actualEnemy, victoryText, defeatText, on
     const isGuideActive = activeItems.has('guia-atendimento');
 
     // --- Turno do HotDog ---
-    let heroDrawsCount = 1; // O HotDog sempre sorteia 1 número por padrão
+    let heroDrawsCount = 1; 
     if (isGuideActive) {
       heroDrawsCount = 2;
       roundLog.push(`📜 Guia de Atendimento ativado! Você sorteia 2 números.`);

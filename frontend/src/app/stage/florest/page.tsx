@@ -10,11 +10,10 @@ export default function Floresta() {
   const [isInBattle, setIsInBattle] = useState(false);
 
   const handleAdvance = useCallback(() => {
-    // Se for o último diálogo, a próxima interação inicia a batalha
+    // Controle do dialogo
     if (dialogueIndex >= FLORESTA.length - 1) {
       setIsInBattle(true);
     } else {
-      // Caso contrário, avança para o próximo diálogo
       setDialogueIndex((prevIndex) => prevIndex + 1);
     }
   }, [dialogueIndex]);
@@ -29,7 +28,6 @@ export default function Floresta() {
       }
     };
 
-    // Adiciona os listeners de eventos
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("click", handleAdvance);
 
@@ -43,14 +41,13 @@ export default function Floresta() {
   const victoryText = "O filho de processus surge - muito obrigado, tome o artefato \"Guia de atendmento\" e vá para o próximo desafio, vou sepultar meu pai.";
   const defeatText = "O monstro matou o filho de processus e o mundo foi destruído por Glozium, uma fatalidade terrível... Fim de jogo!";
 
-  // Se estiver em batalha, renderiza o componente de Batalha
   if (isInBattle) {
     return <Battle enemy={ENEMIES.ANTI_AUTHORIZATUS} victoryText={victoryText} defeatText={defeatText} />;
   }
 
   const isLastDialogue = dialogueIndex === FLORESTA.length - 1;
 
-  // Renderiza a tela de diálogo
+  // Tela de diálogo
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-8 cursor-pointer font-mono">
       <div className="w-full max-w-4xl text-center text-2xl leading-relaxed">
