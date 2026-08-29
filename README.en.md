@@ -1,26 +1,26 @@
-# ⚔️ Desafio Técnico `Acelera ZG 9.0`
+# ⚔️ Technical Challenge `Acelera ZG 9.0`
 
-🌍 Read this in [English](README.en.md)
+🇧🇷 Leia isto em [Português](README.md)
 
-Projeto desenvolvido como parte do processo seletivo para o `Acelera ZG 9.0`.
+Project developed as part of the selection process for `Acelera ZG 9.0`.
 
-## 📝 Sobre o Projeto
+## 📝 About the Project
 
-Um programa que conta uma história interativa (quase um jogo RPG, mas simples) em que o usuário avança pela história através de escolhas e interações via comandos. A história permite passagens pelos eventos, locais e desafios. O personagem evolui e adquire itens ao longo do caminho.
+An application that tells an interactive story (almost a simple RPG game) where the user progresses through the narrative by making choices and interacting via commands. The story allows navigating through events, locations, and challenges. The character evolves and acquires items along the journey.
 
-## 🖼️ Tela (Preview)
+## 🖼️ Screen (Preview)
 
-<img src="./frontend/public/projeto.gif" alt="Demonstração do App" />
+<img src="./frontend/public/projeto.gif" alt="App Demonstration" />
 
 ## Deploy
 
 [![Vercel](https://img.shields.io/badge/vercel-%23000000.svg?style=for-the-badge&logo=vercel&logoColor=white)](https://desafio-zg9.vercel.app/)
 
-## Objetivo do Desafio
+## Challenge Objective
 
-O objetivo é testar a lógica de programação, interpretação de texto e análise de requisitos.
+The objective is to evaluate programming logic, reading comprehension, and requirements analysis.
 
-## Linguagens e ferramentas usadas
+## Languages and Tools Used
 
 [![Git][Git-logo]][Git-url]
 [![ESLint][ESLint-logo]][ESLint-url]
@@ -30,29 +30,30 @@ O objetivo é testar a lógica de programação, interpretação de texto e aná
 [![Next.js][Next.js-logo]][Next.js-url]
 [![Zustand][Zustand-logo]][Zustand-url]
 
-## 🚀 Como Executar o Projeto
+## 🚀 Getting Started
 
-1. **Pré-requisitos:**
-    - É necessário ter o [node.js](https://nodejs.org/pt).
+1. **Prerequisites:**
+    - [Node.js](https://nodejs.org/en) is required.
 
-2. **Navegue até o diretório do frontend:**
+2. **Navigate to the frontend directory:**
 
     ```bash
     cd frontend
     ```
 
-3. **Instale as dependências:**
+3. **Install dependencies:**
 
     ```bash
     npm install
     ```
 
-4. **Execute o servidor:**
+4. **Run the development server:**
 
     ```bash
     npm run dev
     ```
-5. **Acesse a url no seu navegador:**
+
+5. **Open the URL in your browser:**
 
     ```bash
     http://localhost:3000
